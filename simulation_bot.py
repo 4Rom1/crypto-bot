@@ -27,7 +27,7 @@ parser.add_argument('--profit-ratio', type=float, default=1.5,
                     help='Expected rartio between max profit and target profit')
 
 parser.add_argument('--min-profit', type=float, default=0.35,
-                    help='Minimum profit before exiting a trade when price go down')
+                    help='Minimum profit before exiting a trade when price go down and also maximum allowed ATR')
 
 parser.add_argument('--min-volume', type=float, default=1000,
                     help='Minimum last averaged volume')
@@ -38,13 +38,13 @@ parser.add_argument('--max-spread', type=float, default=0.4,
 parser.add_argument('--num-atr', type=float, default=2.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
-parser.add_argument('--max-min-window', type=float, default=1.0,
+parser.add_argument('--max-min-window', type=float, default=0.7,
                     help='Minimum (max - min) values in percents on a window of 5 minute steps given by --significant-steps argument')
 
 parser.add_argument('--significant-steps', type=int, default=14,
                     help='Numbers of last 5 minutes steps to compare with previous history, and window size')
 
-parser.add_argument('--max-rsi', type=float, default=39,
+parser.add_argument('--max-rsi', type=float, default=36,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
 parser.add_argument('--down-move', type=int, default=200,
@@ -191,7 +191,7 @@ if __name__ == "__main__":
                             ratio_atr = atr/current
                             ratio_diff_window = max_diff_window/current
 
-                            if(BuyDict["rsi"] > rsi and ratio_diff_window > max_min_window):
+                            if(BuyDict["rsi"] > rsi and ratio_diff_window > max_min_window and ratio_atr < min_profit):
                                 BuyDict["maxratio"] = ratio_diff_window
                                 BuyDict["rsi"] = rsi
                                 BuyDict["saved_target"] = current + max_diff_window

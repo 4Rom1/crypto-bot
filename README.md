@@ -6,7 +6,7 @@ The bot uses [python-binance api](https://python-binance.readthedocs.io/en/lates
 It fetches among all available pairs ending with USDT and select the ones that respect the criteria (low RSI and bullish trend).  
 It retrieves real time data and averages the signal (bid and ask price) over a period given by the user.  
 The signal to buy is given when  
-- The RSI is lower than a user defined value (default 40).
+- The RSI is lower than a user defined value.
 - When there is a bullish trend (comparing recent average to older one).
 - There is a series of successive increasing close values.
 - when the averaged volume is bigger than a user defined value.    
