@@ -112,7 +112,7 @@ def calculate_metric(data):
         avg_end = np.average(close[-significant_steps:len(close)])
         avg = np.average(close)
 
-        max_diff_window = MaxDiffWindow(close, len(close), window)
+        max_diff_window = MaxDiffWindow(close, window)
 
         high_low = data['High'] - data['Low']
         high_close = np.abs(data['High'] - data['Close'].shift())
