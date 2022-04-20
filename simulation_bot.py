@@ -286,7 +286,7 @@ if __name__ == "__main__":
                 last_avg = avg_price
                 avg_price = 0
 
-            if(prev_avg > last_avg and last_avg > bid_price and (last_avg-buy_price)/buy_price > min_profit):
+            if(prev_avg > last_avg and last_avg > bid_price and (coin_price['bidPrice']-buy_price)/buy_price > min_profit):
                 print(f"last price averaged {last_avg} moved down and profit is bigger than min profit")
                 break
 
