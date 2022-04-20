@@ -86,7 +86,14 @@ num_try = args.num_try
 
 def fetch_klines(asset, interval, previous_time_step):
 
-    klines = client.get_historical_klines(asset, interval, previous_time_step)
+    for _ in range(num_try):
+        try:
+            klines = client.get_historical_klines(asset, interval, previous_time_step)
+        except Exception as e:
+            print(e)
+            sleep(sleep_time)
+            continue
+        break
 
     klines = [x[0:8] for x in klines]
     klines = pd.DataFrame(klines, columns=["O time", "Open", "High", "Low", "Close", "Vol Base", "C time", "Vol quote"])
@@ -294,8 +301,8 @@ if __name__ == "__main__":
                 print(f"Bid price {coin_price['bidPrice']} bigger than take profit {take_profit}")
                 break
 
-            if(last_avg < stop_loss):
-                print(f"last price averaged {last_avg} lower than stop_loss {stop_loss}")
+            if(coin_price['bidPrice'] < stop_loss):
+                print(f"Bid price {coin_price['bidPrice']} lower than stop_loss {stop_loss}")
                 break
 
             if(prev_avg > last_avg and last_avg < bid_price and cnt_down > down_move):
