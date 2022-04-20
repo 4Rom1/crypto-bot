@@ -312,9 +312,11 @@ if __name__ == "__main__":
         pickle.dump({}, open("save_buy.p", "wb"))
 
         BuyDict = {}
-
-        print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*(sell_price-buy_price)/buy_price}%")
+        
+        local_benef = (sell_price-buy_price)/buy_price
+        
+        print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*local_benef}%")
 
         # Trading fees are substracted from the benefits
-        Benefits += (sell_price-buy_price)/sell_price-0.0015
+        Benefits += local_benef - 0.0015
         print(f"Benefits so far {Benefits*100}%")
