@@ -4,7 +4,7 @@ The bot uses [python-binance api](https://python-binance.readthedocs.io/en/lates
 **This is only a simulation, buy or sell order isn't actually performed**, but it gives you the percentage of benefits you'll have if you were to buy or sell in a real time environment.  
 
 It fetches among all available pairs ending with USDT and select the ones that respect the criteria (low RSI and bullish trend).  
-It retrieves real time data and averages the signal (bid and ask price) over a period of user defined number of seconds of spaced signal.  
+It retrieves real time data and averages the signal (bid and ask price) over a period of user defined number of spaced signal.  
 The signal to buy is given when  
 - The RSI is lower than a user defined value (default 40).
 - When there is a bullish trend (comparing recent average to older one).
@@ -12,7 +12,7 @@ The signal to buy is given when
 - when the averaged volume is bigger than a user defined value.    
 
 The signal to sell is given when   
-- The bid price reaches a stop loss defined according to the ATR (average true range) computed over a window of 5 minutes steps
+- The bid price reaches a stop loss calculated with the ATR (average true range) computed over a window of 5 minutes steps
 - when it reaches the take profit value defined by the the maximal value (max-min) over a user defined window of 5 minutes steps
 - when it goes down after successive bullish values and the calculated profit is bigger than a user defined value.  
 
