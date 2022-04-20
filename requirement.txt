@@ -1,0 +1,10 @@
+python-binance
+argparse
+pandas
+pandas_ta
+python-decouple
+futures
+mplfinance
+pickle-mixin
+numpy
+matplotlib
