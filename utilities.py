@@ -8,11 +8,11 @@ def sign(x):
     return -1 if x < 0 else 1
 
 
-def MaxDiffWindow(arr, n, k):
+def MaxDiffWindow(arr, k):
 
     maxdiff = 0
 
-    for i in range(n - k + 1):
+    for i in range(len(arr) - k + 1):
         local_max = arr[i]
         local_min = arr[i]
         for j in range(1, k):
