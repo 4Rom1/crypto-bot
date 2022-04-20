@@ -26,14 +26,14 @@ parser.add_argument('--history-length', type=int, default=6,
 parser.add_argument('--profit-ratio', type=float, default=1.5,
                     help='Expected rartio between max profit and target profit')
 
-parser.add_argument('--min-profit', type=float, default=0.3,
+parser.add_argument('--min-profit', type=float, default=0.35,
                     help='Minimum profit before exiting a trade when price go down')
 
 parser.add_argument('--min-volume', type=float, default=1000,
                     help='Minimum last averaged volume')
 
-parser.add_argument('--min-spread', type=float, default=0.4,
-                    help='Minimum allowed spread in percent')
+parser.add_argument('--max-spread', type=float, default=0.4,
+                    help='Maximal allowed spread in percent')
 
 parser.add_argument('--num-atr', type=float, default=2.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
@@ -44,7 +44,7 @@ parser.add_argument('--max-min-window', type=float, default=1.0,
 parser.add_argument('--significant-steps', type=int, default=14,
                     help='Numbers of last 5 minutes steps to compare with previous history, and window size')
 
-parser.add_argument('--max-rsi', type=float, default=40,
+parser.add_argument('--max-rsi', type=float, default=39,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
 parser.add_argument('--down-move', type=int, default=200,
@@ -73,7 +73,7 @@ min_profit = args.min_profit/100.0
 min_volume = args.min_volume
 down_move = args.down_move
 show_candle = args.show_candle
-min_spread = args.min_spread/100.0
+max_spread = args.max_spread/100.0
 history_length = args.history_length
 max_rsi = args.max_rsi
 significant_steps = args.significant_steps
@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
     USDTCOIN = [coin for coin in prices if coin['symbol'].endswith('USDT')]
 
-    print(f"Number of coins verifying criteria {len(USDTCOIN)}")
+    print(f"Number of coins pairing with USDT {len(USDTCOIN)}")
 
     if os.path.isfile('save_buy.p'):
         BuyDict = pickle.load(open("save_buy.p", "rb"))
@@ -228,7 +228,7 @@ if __name__ == "__main__":
             spread = abs(coin_price['askPrice']-coin_price['bidPrice'])/coin_price['bidPrice']
             print(f"{savedcoin} ask price {coin_price['askPrice']}, spread {spread}")
 
-            if(spread > min_spread):
+            if(spread > max_spread):
                 print(f"current spread = {spread} is too high")
                 break
 
@@ -313,7 +313,7 @@ if __name__ == "__main__":
 
         BuyDict = {}
 
-        print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*(sell_price-buy_price)/sell_price}%")
+        print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*(sell_price-buy_price)/buy_price}%")
 
         # Trading fees are substracted from the benefits
         Benefits += (sell_price-buy_price)/sell_price-0.0015
