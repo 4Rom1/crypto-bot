@@ -18,7 +18,7 @@ parser.add_argument('--period', type=int,
                     help=' period for averaging signal', default=20)
 
 parser.add_argument('--sleep-time', type=int, default=5,
-                    help='Sleep time between signals in seconds')
+                    help='Sleep time between http requests in seconds')
 
 parser.add_argument('--history-length', type=int, default=6,
                     help='Numbers of hours to look back into')
@@ -35,7 +35,7 @@ parser.add_argument('--min-volume', type=float, default=1000,
 parser.add_argument('--min-spread', type=float, default=0.4,
                     help='Minimum allowed spread in percent')
 
-parser.add_argument('--num-atr', type=float, default=3.0,
+parser.add_argument('--num-atr', type=float, default=2.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
 parser.add_argument('--max-min-window', type=float, default=1.0,
