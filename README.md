@@ -4,7 +4,7 @@ The bot uses [python-binance api](https://python-binance.readthedocs.io/en/lates
 **This is only a simulation, buy or sell order isn't actually performed**, but it gives you the percentage of benefits you'll have if you were to buy or sell in a real time environment.  
 
 It fetches among all available pairs ending with USDT and select the ones that respect the criteria (low RSI and bullish trend).  
-It retrieves real time data and averages the signal (bid and ask price) over a period of user defined number of spaced signal.  
+It retrieves real time data and averages the signal (bid and ask price) over a period of user defined number of spaced signals.  
 The signal to buy is given when  
 - The RSI is lower than a user defined value (default 40).
 - When there is a bullish trend (comparing recent average to older one).
@@ -22,5 +22,5 @@ The signal to sell is given when
   > pip3 install -r requirement.txt
 - Run with : 
   > python3 simulation_bot.py
-- Show argument help:
+- Show options help:
   > python3 simulation_bot.py --help   
