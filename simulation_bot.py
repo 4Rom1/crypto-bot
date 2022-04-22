@@ -35,7 +35,7 @@ parser.add_argument('--min-volume', type=float, default=1000,
 parser.add_argument('--max-spread', type=float, default=0.4,
                     help='Maximal allowed spread in percent')
 
-parser.add_argument('--num-atr', type=float, default=2.0,
+parser.add_argument('--num-atr', type=float, default=1.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
 parser.add_argument('--max-min-window', type=float, default=0.7,
@@ -240,42 +240,42 @@ if __name__ == "__main__":
 
             while(True):
 
-                    for _ in range(num_try):
-                        try:
-                            coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
-                        except Exception as e:
-                            print(e)
-                            sleep(sleep_time)
-                            continue
-                        break
+                for _ in range(num_try):
+                    try:
+                        coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
+                    except Exception as e:
+                        print(e)
+                        sleep(sleep_time)
+                        continue
+                    break
 
-                    if cnt % period == 0:
-                        print(f"{coin_price}")
-                        avg_price = avg_price/period if cnt > 0 else avg_price
-                        print(f"Average price {avg_price}")
-                        prev_avg = last_avg
-                        last_avg = avg_price
-                        avg_price = 0
+                if cnt % period == 0:
+                    print(f"{coin_price}")
+                    avg_price = avg_price/period if cnt > 0 else avg_price
+                    print(f"Average price {avg_price}")
+                    prev_avg = last_avg
+                    last_avg = avg_price
+                    avg_price = 0
 
-                    if(prev_avg < last_avg):
-                        if previous_bullish:
-                            cnt_bullish += 1
-                        else:
-                            previous_bullish = True
-                            cnt_bullish = 1
-                        
-                        if cnt_bullish >= successive_bullish:
-                            print(f"Last price averaged {last_avg} moved up {successive_bullish} times: buying ")
-                            break
+                if(prev_avg < last_avg):
+                    if previous_bullish:
+                        cnt_bullish += 1
                     else:
-                        previous_bullish = False 
-                        cnt_bullish = 0   
+                        previous_bullish = True
+                        cnt_bullish = 1
 
-                    sleep(sleep_time)
+                    if cnt_bullish >= successive_bullish:
+                        print(f"Last price averaged {last_avg} moved up {successive_bullish} times: buying ")
+                        break
+                else:
+                    previous_bullish = False
+                    cnt_bullish = 0
 
-                    cnt += 1
-                    avg_price += coin_price['askPrice']
-            
+                sleep(sleep_time)
+
+                cnt += 1
+                avg_price += coin_price['askPrice']
+
             buy_price = coin_price['askPrice']
             bid_price = coin_price['bidPrice']
 
@@ -356,9 +356,9 @@ if __name__ == "__main__":
         pickle.dump({}, open("save_buy.p", "wb"))
 
         BuyDict = {}
-        
+
         local_benef = (sell_price-buy_price)/buy_price
-        
+
         print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*local_benef}%")
 
         # Trading fees are substracted from the benefits
