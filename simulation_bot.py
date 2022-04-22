@@ -26,7 +26,7 @@ parser.add_argument('--history-length', type=int, default=6,
 parser.add_argument('--profit-ratio', type=float, default=1.5,
                     help='Expected rartio between max profit and target profit')
 
-parser.add_argument('--min-profit', type=float, default=0.35,
+parser.add_argument('--min-profit', type=float, default=0.25,
                     help='Minimum profit before exiting a trade when price go down and also maximum allowed ATR')
 
 parser.add_argument('--min-volume', type=float, default=1000,
@@ -116,8 +116,6 @@ def get_rsi(klines, length=rsi_lenght):
 def calculate_metric(data):
     if len(data['Close']) > 2 and len(data['Open']) > 2:
         close = np.array(data['Close'])
-        avg_end = np.average(close[-significant_steps:len(close)])
-        avg = np.average(close)
 
         max_diff_window = MaxDiffWindow(close, window)
 
@@ -129,19 +127,13 @@ def calculate_metric(data):
 
         atr = np.average(true_range[-significant_steps:len(true_range)])
 
-        bullish = True
-        for i in range(1, successive_bullish):
-            bullish = bullish and (data['Close'].iloc[-i-1] < data['Close'].iloc[-i])
-
-        bullish = bullish and avg_end > avg
-
         RSI = get_rsi(data)
 
         current = data['Close'].iloc[-1]
 
         vol = data['Vol quote'].mean()
 
-        if vol > min_volume and bullish and RSI < max_rsi:
+        if vol > min_volume and RSI < max_rsi:
             return current, max_diff_window, atr, RSI
         else:
             return 0, 0, 0, 0
@@ -239,6 +231,51 @@ if __name__ == "__main__":
                 print(f"current spread = {spread} is too high")
                 break
 
+            cnt = 0
+            avg_price = saved_current
+            last_avg = avg_price
+            prev_avg = last_avg
+            cnt_bullish = 0
+            previous_bullish = True
+
+            while(True):
+
+                    for _ in range(num_try):
+                        try:
+                            coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
+                        except Exception as e:
+                            print(e)
+                            sleep(sleep_time)
+                            continue
+                        break
+
+                    if cnt % period == 0:
+                        print(f"{coin_price}")
+                        avg_price = avg_price/period if cnt > 0 else avg_price
+                        print(f"Average price {avg_price}")
+                        prev_avg = last_avg
+                        last_avg = avg_price
+                        avg_price = 0
+
+                    if(prev_avg < last_avg):
+                        if previous_bullish:
+                            cnt_bullish += 1
+                        else:
+                            previous_bullish = True
+                            cnt_bullish = 1
+                        
+                        if cnt_bullish >= successive_bullish:
+                            print(f"Last price averaged {last_avg} moved up {successive_bullish} times: buying ")
+                            break
+                    else:
+                        previous_bullish = False 
+                        cnt_bullish = 0   
+
+                    sleep(sleep_time)
+
+                    cnt += 1
+                    avg_price += coin_price['askPrice']
+            
             buy_price = coin_price['askPrice']
             bid_price = coin_price['bidPrice']
 
