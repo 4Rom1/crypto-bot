@@ -14,8 +14,11 @@ import pickle
 parser = argparse.ArgumentParser(description='Simple bot trading simulation.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 
-parser.add_argument('--period', type=int,
-                    help=' period for averaging signal', default=20)
+parser.add_argument('--sell-period', type=int,
+                    help=' period for averaging signal during selling period', default=20)
+
+parser.add_argument('--buy-period', type=int,
+                    help=' period for averaging signal during buying period', default=30)
 
 parser.add_argument('--sleep-time', type=int, default=5,
                     help='Sleep time between http requests in seconds')
@@ -68,7 +71,8 @@ Benefits = 0
 profit_ratio = args.profit_ratio
 max_min_window = float(args.max_min_window)/100.0
 sleep_time = args.sleep_time
-period = args.period
+sell_period = args.sell_period
+buy_period = args.buy_period
 min_profit = args.min_profit/100.0
 min_volume = args.min_volume
 down_move = args.down_move
@@ -249,9 +253,9 @@ if __name__ == "__main__":
                         continue
                     break
 
-                if cnt % period == 0:
+                if cnt % buy_period == 0:
                     print(f"{coin_price}")
-                    avg_price = avg_price/period if cnt > 0 else avg_price
+                    avg_price = avg_price/buy_period if cnt > 0 else avg_price
                     print(f"Average price {avg_price}")
                     prev_avg = last_avg
                     last_avg = avg_price
@@ -319,9 +323,9 @@ if __name__ == "__main__":
                     continue
                 break
 
-            if cnt % period == 0:
+            if cnt % sell_period == 0:
                 print(f"{coin_price}")
-                avg_price = avg_price/period if cnt > 0 else avg_price
+                avg_price = avg_price/sell_period if cnt > 0 else avg_price
                 if(prev_avg > last_avg and last_avg < bid_price and cnt_down <= down_move):
                     print(f"last price averaged {last_avg} moved down and price is lower than initial bid price for the {cnt_down+1} time")
                     cnt_down += 1
