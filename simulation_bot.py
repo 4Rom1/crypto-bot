@@ -38,7 +38,7 @@ parser.add_argument('--min-volume', type=float, default=1000,
 parser.add_argument('--max-spread', type=float, default=0.4,
                     help='Maximal allowed spread in percent')
 
-parser.add_argument('--num-atr', type=float, default=1.0,
+parser.add_argument('--num-atr', type=float, default=2.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
 parser.add_argument('--max-min-window', type=float, default=0.7,
@@ -50,10 +50,7 @@ parser.add_argument('--significant-steps', type=int, default=14,
 parser.add_argument('--max-rsi', type=float, default=36,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
-parser.add_argument('--down-move', type=int, default=200,
-                    help='Maximum authorised down movement of price before selling (it has to be lower than the bought price)')
-
-parser.add_argument('--successive-bullish', type=int, default=3,
+parser.add_argument('--successive-bullish', type=int, default=2,
                     help='Number of expected succesive bullish before being selected')
 
 parser.add_argument('--num-try', type=int, default=2,
@@ -78,7 +75,6 @@ sell_period = args.sell_period
 buy_period = args.buy_period
 min_profit = args.min_profit/100.0
 min_volume = args.min_volume
-down_move = args.down_move
 show_candle = args.show_candle
 max_spread = args.max_spread/100.0
 history_length = args.history_length
@@ -246,7 +242,6 @@ if __name__ == "__main__":
             cnt = 0
             avg_price = saved_current
             last_avg = avg_price
-            prev_avg = last_avg
             cnt_bullish = 0
             previous_bullish = True
 
@@ -265,23 +260,22 @@ if __name__ == "__main__":
                     print(f"{coin_price}")
                     avg_price = avg_price/buy_period if cnt > 0 else avg_price
                     print(f"Average price {avg_price}")
-                    prev_avg = last_avg
+                    if(last_avg < avg_price):
+                        if previous_bullish:
+                            cnt_bullish += 1
+                        else:
+                            previous_bullish = True
+                            cnt_bullish = 1
+
+                        if cnt_bullish >= successive_bullish:
+                            print(f"Last price averaged {last_avg} moved up {successive_bullish} times: buying ")
+                            break
+                    else:
+                        previous_bullish = False
+                        cnt_bullish = 0
+
                     last_avg = avg_price
                     avg_price = 0
-
-                if(prev_avg < last_avg):
-                    if previous_bullish:
-                        cnt_bullish += 1
-                    else:
-                        previous_bullish = True
-                        cnt_bullish = 1
-
-                    if cnt_bullish >= successive_bullish:
-                        print(f"Last price averaged {last_avg} moved up {successive_bullish} times: buying ")
-                        break
-                else:
-                    previous_bullish = False
-                    cnt_bullish = 0
 
                 sleep(sleep_time)
 
@@ -334,7 +328,7 @@ if __name__ == "__main__":
             if cnt % sell_period == 0:
                 print(f"{coin_price}")
                 avg_price = avg_price/sell_period if cnt > 0 else avg_price
-                if(prev_avg > last_avg and last_avg < bid_price and cnt_down <= down_move):
+                if(prev_avg > last_avg and last_avg < bid_price):
                     print(f"last price averaged {last_avg} moved down and price is lower than initial bid price for the {cnt_down+1} time")
                     cnt_down += 1
                 print(f"Average price {avg_price}")
@@ -352,10 +346,6 @@ if __name__ == "__main__":
 
             if(coin_price['bidPrice'] < stop_loss):
                 print(f"Bid price {coin_price['bidPrice']} lower than stop_loss {stop_loss}")
-                break
-
-            if(prev_avg > last_avg and last_avg < bid_price and cnt_down > down_move):
-                print(f"last price averaged {last_avg} moved down  more than {down_move} times and price is lower than buy price")
                 break
 
             sleep(sleep_time)
