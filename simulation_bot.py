@@ -62,6 +62,9 @@ parser.add_argument('--num-try', type=int, default=2,
 parser.add_argument('--show-candle', type=bool, default=False,
                     help='Show candlestick of selected asset')
 
+parser.add_argument('--avg-up', type=bool, default=False,
+                    help='Requires average moving up from the selected history to the recent one')
+
 
 args = parser.parse_args()
 
@@ -86,6 +89,7 @@ num_atr = args.num_atr
 window = significant_steps
 rsi_lenght = significant_steps
 num_try = args.num_try
+avg_up = args.avg_up
 
 
 def fetch_klines(asset, interval, previous_time_step):
@@ -139,7 +143,9 @@ def calculate_metric(data):
 
         vol = data['Vol quote'].mean()
 
-        if vol > min_volume and RSI < max_rsi and avg < avg_end:
+        bullish_avg = True if not avg_up else (avg < avg_end)
+
+        if vol > min_volume and RSI < max_rsi and bullish_avg:
             return current, max_diff_window, atr, RSI
         else:
             return 0, 0, 0, 0
