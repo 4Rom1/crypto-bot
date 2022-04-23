@@ -38,7 +38,7 @@ parser.add_argument('--min-volume', type=float, default=1000,
 parser.add_argument('--max-spread', type=float, default=0.4,
                     help='Maximal allowed spread in percent')
 
-parser.add_argument('--num-atr', type=float, default=1.0,
+parser.add_argument('--num-atr', type=float, default=2.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
 parser.add_argument('--max-min-window', type=float, default=0.7,
@@ -301,7 +301,7 @@ if __name__ == "__main__":
             bid_price = BuyDict["bid_price"]
             buy_price = BuyDict["buy_price"]
 
-        print(f"take_profit {take_profit}={(1.0+maxratio/profit_ratio)*100.0} % of price, stop loss {stop_loss}={(1-saved_atr)*100.0} % of price")
+        print(f"take_profit {take_profit}={(1.0+maxratio/profit_ratio)*100.0} % of price, stop loss {stop_loss}={(1-num_atr*saved_atr)*100.0} % of price")
         print(f"buy price {buy_price}")
         print(f"Corresponding bid price {bid_price}")
 
