@@ -120,6 +120,8 @@ def get_rsi(klines, length=rsi_lenght):
 def calculate_metric(data):
     if len(data['Close']) > 2 and len(data['Open']) > 2:
         close = np.array(data['Close'])
+        avg = np.average(close)
+        avg_end = np.average(close[-significant_steps:len(close)])
 
         max_diff_window = MaxDiffWindow(close, window)
 
@@ -137,7 +139,7 @@ def calculate_metric(data):
 
         vol = data['Vol quote'].mean()
 
-        if vol > min_volume and RSI < max_rsi:
+        if vol > min_volume and RSI < max_rsi and avg < avg_end:
             return current, max_diff_window, atr, RSI
         else:
             return 0, 0, 0, 0
