@@ -18,7 +18,7 @@ parser.add_argument('--sell-period', type=int,
                     help=' period for averaging signal during selling period', default=20)
 
 parser.add_argument('--buy-period', type=int,
-                    help=' period for averaging signal during buying period', default=30)
+                    help=' period for averaging signal during buying period', default=20)
 
 parser.add_argument('--sleep-time', type=int, default=5,
                     help='Sleep time between http requests in seconds')
@@ -53,7 +53,7 @@ parser.add_argument('--max-rsi', type=float, default=36,
 parser.add_argument('--down-move', type=int, default=200,
                     help='Maximum authorised down movement of price before selling (it has to be lower than the bought price)')
 
-parser.add_argument('--successive-bullish', type=int, default=1,
+parser.add_argument('--successive-bullish', type=int, default=2,
                     help='Number of expected succesive bullish before being selected')
 
 parser.add_argument('--num-try', type=int, default=2,
