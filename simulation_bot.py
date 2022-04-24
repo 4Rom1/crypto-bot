@@ -15,10 +15,10 @@ parser = argparse.ArgumentParser(description='Simple bot trading simulation.', f
 
 
 parser.add_argument('--sell-period', type=int,
-                    help=' period for averaging signal during selling period', default=20)
+                    help=' period for averaging signal during selling period', default=40)
 
 parser.add_argument('--buy-period', type=int,
-                    help=' period for averaging signal during buying period', default=20)
+                    help=' period for averaging signal during buying period', default=60)
 
 parser.add_argument('--sleep-time', type=int, default=5,
                     help='Sleep time between http requests in seconds')
