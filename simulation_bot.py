@@ -29,16 +29,16 @@ parser.add_argument('--history-length', type=int, default=6,
 parser.add_argument('--profit-ratio', type=float, default=1.5,
                     help='Expected rartio between max profit and target profit')
 
-parser.add_argument('--min-profit', type=float, default=0.25,
+parser.add_argument('--min-profit', type=float, default=0.4,
                     help='Minimum profit before exiting a trade when price go down and also maximum allowed ATR')
 
 parser.add_argument('--min-volume', type=float, default=1000,
                     help='Minimum last averaged volume')
 
-parser.add_argument('--max-spread', type=float, default=0.4,
+parser.add_argument('--max-spread', type=float, default=0.2,
                     help='Maximal allowed spread in percent')
 
-parser.add_argument('--num-atr', type=float, default=2.0,
+parser.add_argument('--num-atr', type=float, default=10.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
 parser.add_argument('--max-min-window', type=float, default=0.7,
@@ -47,10 +47,10 @@ parser.add_argument('--max-min-window', type=float, default=0.7,
 parser.add_argument('--significant-steps', type=int, default=14,
                     help='Numbers of last 5 minutes steps to compare with previous history, and window size')
 
-parser.add_argument('--max-rsi', type=float, default=36,
+parser.add_argument('--max-rsi', type=float, default=30,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
-parser.add_argument('--successive-bullish', type=int, default=2,
+parser.add_argument('--successive-bullish', type=int, default=1,
                     help='Number of expected succesive bullish before being selected')
 
 parser.add_argument('--num-try', type=int, default=2,
@@ -172,78 +172,147 @@ if __name__ == "__main__":
         BuyDict = pickle.load(open("save_buy.p", "rb"))
     else:
         BuyDict = {}
-
     while True:
-        print("Fetch coins according to criteria")
-        if not ("bid_price" in BuyDict):
-            cnt = 0
-            BuyDict["savedcoin"] = None
-            BuyDict["maxratio"] = 0
-            BuyDict["rsi"] = 200
-            BuyDict["atr_ratio"] = 100
-            BuyDict["saved_target"] = 0
-            BuyDict["saved_atr"] = 0
+        while True:
+            print("Fetch coins according to criteria")
+            if not ("bid_price" in BuyDict):
+                cnt = 0
+                BuyDict["savedcoin"] = None
+                BuyDict["maxratio"] = 0
+                BuyDict["rsi"] = 200
+                BuyDict["atr_ratio"] = 100
+                BuyDict["saved_target"] = 0
+                BuyDict["saved_atr"] = 0
 
-            while(BuyDict["savedcoin"] is None):
-                with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-                    for current, max_diff_window, atr, rsi, coin in executor.map(select_max, USDTCOIN):
-                        if current > 0:
-                            ratio_atr = atr/current
-                            ratio_diff_window = max_diff_window/current
+                while(BuyDict["savedcoin"] is None):
+                    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+                        for current, max_diff_window, atr, rsi, coin in executor.map(select_max, USDTCOIN):
+                            if current > 0:
+                                ratio_atr = atr/current
+                                ratio_diff_window = max_diff_window/current
 
-                            if(BuyDict["rsi"] > rsi and ratio_diff_window > max_min_window and ratio_atr < min_profit):
-                                BuyDict["maxratio"] = ratio_diff_window
-                                BuyDict["rsi"] = rsi
-                                BuyDict["saved_target"] = current + max_diff_window
-                                BuyDict["saved_current"] = current
-                                BuyDict["savedcoin"] = coin['symbol']
-                                BuyDict["saved_atr"] = ratio_atr
-                        cnt += 1
-                # Sleep if not found to avoid limit requests
-                if BuyDict["savedcoin"] is None:
-                    print("Fetch again as criteria not met")
-                    sleep(20)
+                                if(BuyDict["rsi"] > rsi and ratio_diff_window > max_min_window and ratio_atr < min_profit):
+                                    BuyDict["maxratio"] = ratio_diff_window
+                                    BuyDict["rsi"] = rsi
+                                    BuyDict["saved_target"] = current + max_diff_window
+                                    BuyDict["saved_current"] = current
+                                    BuyDict["savedcoin"] = coin['symbol']
+                                    BuyDict["saved_atr"] = ratio_atr
+                            cnt += 1
+                    # Sleep if not found to avoid limit requests
+                    if BuyDict["savedcoin"] is None:
+                        print("Fetch again as criteria not met")
+                        sleep(20)
 
-        else:
-            BuyDict = pickle.load(open("save_buy.p", "rb"))
+            else:
+                BuyDict = pickle.load(open("save_buy.p", "rb"))
 
-        savedcoin = BuyDict["savedcoin"]
-        maxratio = BuyDict["maxratio"]
-        saved_target = BuyDict["saved_target"]
-        saved_current = BuyDict["saved_current"]
-        saved_atr = BuyDict["saved_atr"]
-        saved_rsi = BuyDict["rsi"]
+            savedcoin = BuyDict["savedcoin"]
+            maxratio = BuyDict["maxratio"]
+            saved_target = BuyDict["saved_target"]
+            saved_current = BuyDict["saved_current"]
+            saved_atr = BuyDict["saved_atr"]
+            saved_rsi = BuyDict["rsi"]
 
-        print(f'Candidate {savedcoin}, maximum window ratio (max-min)/current {maxratio*100}%, target high {saved_target}, current {saved_current}, ATR {saved_atr*100}%, rsi {saved_rsi}')
+            print(f'Candidate {savedcoin}, maximum window ratio (max-min)/current {maxratio*100}%, target high {saved_target}, current {saved_current}, ATR {saved_atr*100}%, rsi {saved_rsi}')
 
-        data = fetch_klines(savedcoin, Client.KLINE_INTERVAL_5MINUTE, "2 hours ago UTC")
-        print(data)
-        if show_candle:
+            data = fetch_klines(savedcoin, Client.KLINE_INTERVAL_5MINUTE, "2 hours ago UTC")
+            print(data)
+            if show_candle:
 
-            show_chart(data, savedcoin)
+                show_chart(data, savedcoin)
 
-        if not ("bid_price" in BuyDict):
-            for _ in range(num_try):
-                try:
-                    coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
-                except Exception as e:
-                    print(e)
+            if not ("bid_price" in BuyDict):
+                for _ in range(num_try):
+                    try:
+                        coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
+                    except Exception as e:
+                        print(e)
+                        sleep(sleep_time)
+                        continue
+                    break
+
+                spread = abs(coin_price['askPrice']-coin_price['bidPrice'])/coin_price['bidPrice']
+                print(f"{savedcoin} ask price {coin_price['askPrice']}, spread {spread}")
+
+                if(spread > max_spread):
+                    print(f"current spread = {spread} is too high")
+                    break
+
+                cnt = 0
+                avg_price = saved_current
+                last_avg = avg_price
+                cnt_bullish = 0
+                previous_bullish = True
+
+                while(True):
+
+                    for _ in range(num_try):
+                        try:
+                            coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
+                        except Exception as e:
+                            print(e)
+                            sleep(sleep_time)
+                            continue
+                        break
+
+                    if cnt % buy_period == 0:
+                        print(f"{coin_price}")
+                        avg_price = avg_price/buy_period if cnt > 0 else avg_price
+                        print(f"Average price {avg_price}")
+                        if(last_avg < avg_price):
+                            if previous_bullish:
+                                cnt_bullish += 1
+                            else:
+                                previous_bullish = True
+                                cnt_bullish = 1
+
+                            if cnt_bullish >= successive_bullish:
+                                print(f"Last price averaged {last_avg} moved up {successive_bullish} times: buying ")
+                                break
+                        else:
+                            previous_bullish = False
+                            cnt_bullish = 0
+
+                        last_avg = avg_price
+                        avg_price = 0
+
                     sleep(sleep_time)
-                    continue
-                break
 
-            spread = abs(coin_price['askPrice']-coin_price['bidPrice'])/coin_price['bidPrice']
-            print(f"{savedcoin} ask price {coin_price['askPrice']}, spread {spread}")
+                    cnt += 1
+                    avg_price += coin_price['askPrice']
 
-            if(spread > max_spread):
-                print(f"current spread = {spread} is too high")
-                break
+                buy_price = coin_price['askPrice']
+                bid_price = coin_price['bidPrice']
+
+                stop_loss = (1.0-num_atr*saved_atr)*bid_price
+                take_profit = (1.0+maxratio/profit_ratio)*buy_price
+
+                BuyDict["take_profit"] = take_profit
+                BuyDict["stop_loss"] = stop_loss
+                BuyDict["bid_price"] = bid_price
+                BuyDict["buy_price"] = buy_price
+
+                pickle.dump(BuyDict, open("save_buy.p", "wb"))
+            else:
+
+                take_profit = BuyDict["take_profit"]
+                stop_loss = BuyDict["stop_loss"]
+                bid_price = BuyDict["bid_price"]
+                buy_price = BuyDict["buy_price"]
+
+            print(f"take_profit {take_profit}={(1.0+maxratio/profit_ratio)*100.0} % of price, stop loss {stop_loss}={(1-num_atr*saved_atr)*100.0} % of price")
+            print(f"buy price {buy_price}")
+            print(f"Corresponding bid price {bid_price}")
+
+            sleep(sleep_time)
 
             cnt = 0
-            avg_price = saved_current
+            avg_price = bid_price
             last_avg = avg_price
-            cnt_bullish = 0
-            previous_bullish = True
+            prev_avg = last_avg
+
+            cnt_down = 0
 
             while(True):
 
@@ -256,113 +325,44 @@ if __name__ == "__main__":
                         continue
                     break
 
-                if cnt % buy_period == 0:
+                if cnt % sell_period == 0:
                     print(f"{coin_price}")
-                    avg_price = avg_price/buy_period if cnt > 0 else avg_price
+                    avg_price = avg_price/sell_period if cnt > 0 else avg_price
+                    if(prev_avg > last_avg and last_avg < bid_price):
+                        print(f"last price averaged {last_avg} moved down and price is lower than initial bid price for the {cnt_down+1} time")
+                        cnt_down += 1
                     print(f"Average price {avg_price}")
-                    if(last_avg < avg_price):
-                        if previous_bullish:
-                            cnt_bullish += 1
-                        else:
-                            previous_bullish = True
-                            cnt_bullish = 1
-
-                        if cnt_bullish >= successive_bullish:
-                            print(f"Last price averaged {last_avg} moved up {successive_bullish} times: buying ")
-                            break
-                    else:
-                        previous_bullish = False
-                        cnt_bullish = 0
-
+                    prev_avg = last_avg
                     last_avg = avg_price
                     avg_price = 0
+
+                if(prev_avg > last_avg and last_avg > bid_price and (coin_price['bidPrice']-buy_price)/buy_price > min_profit):
+                    print(f"last price averaged {last_avg} moved down and profit is bigger than min profit")
+                    break
+
+                if(coin_price['bidPrice'] > take_profit):
+                    print(f"Bid price {coin_price['bidPrice']} bigger than take profit {take_profit}")
+                    break
+
+                if(coin_price['bidPrice'] < stop_loss):
+                    print(f"Bid price {coin_price['bidPrice']} lower than stop_loss {stop_loss}")
+                    break
 
                 sleep(sleep_time)
 
                 cnt += 1
-                avg_price += coin_price['askPrice']
+                avg_price += coin_price['bidPrice']
 
-            buy_price = coin_price['askPrice']
-            bid_price = coin_price['bidPrice']
+            sell_price = coin_price['bidPrice']
 
-            stop_loss = (1.0-num_atr*saved_atr)*bid_price
-            take_profit = (1.0+maxratio/profit_ratio)*buy_price
+            pickle.dump({}, open("save_buy.p", "wb"))
 
-            BuyDict["take_profit"] = take_profit
-            BuyDict["stop_loss"] = stop_loss
-            BuyDict["bid_price"] = bid_price
-            BuyDict["buy_price"] = buy_price
+            BuyDict = {}
 
-            pickle.dump(BuyDict, open("save_buy.p", "wb"))
-        else:
+            local_benef = (sell_price-buy_price)/buy_price
 
-            take_profit = BuyDict["take_profit"]
-            stop_loss = BuyDict["stop_loss"]
-            bid_price = BuyDict["bid_price"]
-            buy_price = BuyDict["buy_price"]
+            print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*local_benef}%")
 
-        print(f"take_profit {take_profit}={(1.0+maxratio/profit_ratio)*100.0} % of price, stop loss {stop_loss}={(1-num_atr*saved_atr)*100.0} % of price")
-        print(f"buy price {buy_price}")
-        print(f"Corresponding bid price {bid_price}")
-
-        sleep(sleep_time)
-
-        cnt = 0
-        avg_price = bid_price
-        last_avg = avg_price
-        prev_avg = last_avg
-
-        cnt_down = 0
-
-        while(True):
-
-            for _ in range(num_try):
-                try:
-                    coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
-                except Exception as e:
-                    print(e)
-                    sleep(sleep_time)
-                    continue
-                break
-
-            if cnt % sell_period == 0:
-                print(f"{coin_price}")
-                avg_price = avg_price/sell_period if cnt > 0 else avg_price
-                if(prev_avg > last_avg and last_avg < bid_price):
-                    print(f"last price averaged {last_avg} moved down and price is lower than initial bid price for the {cnt_down+1} time")
-                    cnt_down += 1
-                print(f"Average price {avg_price}")
-                prev_avg = last_avg
-                last_avg = avg_price
-                avg_price = 0
-
-            if(prev_avg > last_avg and last_avg > bid_price and (coin_price['bidPrice']-buy_price)/buy_price > min_profit):
-                print(f"last price averaged {last_avg} moved down and profit is bigger than min profit")
-                break
-
-            if(coin_price['bidPrice'] > take_profit):
-                print(f"Bid price {coin_price['bidPrice']} bigger than take profit {take_profit}")
-                break
-
-            if(coin_price['bidPrice'] < stop_loss):
-                print(f"Bid price {coin_price['bidPrice']} lower than stop_loss {stop_loss}")
-                break
-
-            sleep(sleep_time)
-
-            cnt += 1
-            avg_price += coin_price['bidPrice']
-
-        sell_price = coin_price['bidPrice']
-
-        pickle.dump({}, open("save_buy.p", "wb"))
-
-        BuyDict = {}
-
-        local_benef = (sell_price-buy_price)/buy_price
-
-        print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*local_benef}%")
-
-        # Trading fees are substracted from the benefits
-        Benefits += local_benef - 0.0015
-        print(f"Benefits so far {Benefits*100}%")
+            # Trading fees are substracted from the benefits
+            Benefits += local_benef - 0.0015
+            print(f"Benefits so far {Benefits*100}%")
