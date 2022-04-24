@@ -15,10 +15,10 @@ parser = argparse.ArgumentParser(description='Simple bot trading simulation.', f
 
 
 parser.add_argument('--sell-period', type=int,
-                    help=' period for averaging signal during selling period', default=40)
+                    help=' period for averaging signal during selling period', default=20)
 
 parser.add_argument('--buy-period', type=int,
-                    help=' period for averaging signal during buying period', default=60)
+                    help=' period for averaging signal during buying period', default=30)
 
 parser.add_argument('--sleep-time', type=int, default=5,
                     help='Sleep time between http requests in seconds')
@@ -50,7 +50,7 @@ parser.add_argument('--significant-steps', type=int, default=14,
 parser.add_argument('--max-rsi', type=float, default=30,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
-parser.add_argument('--successive-bullish', type=int, default=1,
+parser.add_argument('--successive-bullish', type=int, default=2,
                     help='Number of expected succesive bullish before being selected')
 
 parser.add_argument('--num-try', type=int, default=2,
