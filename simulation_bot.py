@@ -50,7 +50,7 @@ parser.add_argument('--significant-steps', type=int, default=14,
 parser.add_argument('--max-rsi', type=float, default=30,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
-parser.add_argument('--successive-bullish', type=int, default=2,
+parser.add_argument('--successive-bullish', type=int, default=1,
                     help='Number of expected succesive bullish before being selected')
 
 parser.add_argument('--num-try', type=int, default=2,
