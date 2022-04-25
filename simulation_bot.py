@@ -29,7 +29,7 @@ parser.add_argument('--history-length', type=int, default=6,
 parser.add_argument('--profit-ratio', type=float, default=1.5,
                     help='Expected rartio between max profit and target profit')
 
-parser.add_argument('--min-profit', type=float, default=0.4,
+parser.add_argument('--min-profit', type=float, default=0.5,
                     help='Minimum profit before exiting a trade when price go down and also maximum allowed ATR')
 
 parser.add_argument('--min-volume', type=float, default=1000,
@@ -47,7 +47,7 @@ parser.add_argument('--max-min-window', type=float, default=0.7,
 parser.add_argument('--significant-steps', type=int, default=14,
                     help='Numbers of last 5 minutes steps to compare with previous history, and window size')
 
-parser.add_argument('--max-rsi', type=float, default=30,
+parser.add_argument('--max-rsi', type=float, default=35,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
 parser.add_argument('--successive-bullish', type=int, default=2,
@@ -59,7 +59,7 @@ parser.add_argument('--num-try', type=int, default=2,
 parser.add_argument('--show-candle', type=bool, default=False,
                     help='Show candlestick of selected asset')
 
-parser.add_argument('--avg-up', type=bool, default=False,
+parser.add_argument('--avg-up', type=bool, default=True,
                     help='Requires average moving up from the selected history to the recent one')
 
 
