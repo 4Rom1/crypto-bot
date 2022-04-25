@@ -18,12 +18,12 @@ parser.add_argument('--sell-period', type=int,
                     help=' period for averaging signal during selling period', default=20)
 
 parser.add_argument('--buy-period', type=int,
-                    help=' period for averaging signal during buying period', default=30)
+                    help=' period for averaging signal during buying period', default=40)
 
 parser.add_argument('--sleep-time', type=int, default=5,
                     help='Sleep time between http requests in seconds')
 
-parser.add_argument('--history-length', type=int, default=6,
+parser.add_argument('--history-length', type=int, default=2,
                     help='Numbers of hours to look back into')
 
 parser.add_argument('--profit-ratio', type=float, default=1.5,
@@ -47,7 +47,7 @@ parser.add_argument('--max-min-window', type=float, default=0.7,
 parser.add_argument('--significant-steps', type=int, default=14,
                     help='Numbers of last 5 minutes steps to compare with previous history, and window size')
 
-parser.add_argument('--max-rsi', type=float, default=35,
+parser.add_argument('--max-rsi', type=float, default=30,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
 parser.add_argument('--successive-bullish', type=int, default=2,
@@ -59,7 +59,7 @@ parser.add_argument('--num-try', type=int, default=2,
 parser.add_argument('--show-candle', type=bool, default=False,
                     help='Show candlestick of selected asset')
 
-parser.add_argument('--avg-up', type=bool, default=True,
+parser.add_argument('--avg-up', type=bool, default=False,
                     help='Requires average moving up from the selected history to the recent one')
 
 
