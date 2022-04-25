@@ -47,7 +47,7 @@ parser.add_argument('--max-min-window', type=float, default=1,
 parser.add_argument('--significant-steps', type=int, default=14,
                     help='Numbers of last 5 minutes steps to compare with previous history, and window size')
 
-parser.add_argument('--max-rsi', type=float, default=30,
+parser.add_argument('--max-rsi', type=float, default=32,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
 parser.add_argument('--successive-bullish', type=int, default=1,
