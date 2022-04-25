@@ -120,6 +120,11 @@ def get_rsi(klines, length=rsi_lenght):
 def calculate_metric(data):
     if len(data['Close']) > 2 and len(data['Open']) > 2:
         close = np.array(data['Close'])
+        open = np.array(data['Open'])
+        
+        max_oc = max(close - open)
+        max_co = max(open - close)
+        
         avg = np.average(close)
         avg_end = np.average(close[-significant_steps:len(close)])
 
@@ -141,7 +146,7 @@ def calculate_metric(data):
 
         bullish_avg = True if not avg_up else (avg < avg_end)
 
-        if vol > min_volume and RSI < max_rsi and bullish_avg:
+        if vol > min_volume and RSI < max_rsi and bullish_avg and max_co > max_oc:
             return current, max_diff_window, atr, RSI
         else:
             return 0, 0, 0, 0
