@@ -122,8 +122,8 @@ def calculate_metric(data):
         close = np.array(data['Close'])
         open = np.array(data['Open'])
         
-        max_oc = max(close - open)
-        max_co = max(open - close)
+        max_co = max(close - open)
+        max_oc = max(open - close)
         
         avg = np.average(close)
         avg_end = np.average(close[-significant_steps:len(close)])
