@@ -41,13 +41,13 @@ parser.add_argument('--max-spread', type=float, default=0.2,
 parser.add_argument('--num-atr', type=float, default=10.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
-parser.add_argument('--max-min-window', type=float, default=0.7,
+parser.add_argument('--max-min-window', type=float, default=1,
                     help='Minimum (max - min) values in percents on a window of 5 minute steps given by --significant-steps argument')
 
 parser.add_argument('--significant-steps', type=int, default=14,
                     help='Numbers of last 5 minutes steps to compare with previous history, and window size')
 
-parser.add_argument('--max-rsi', type=float, default=30,
+parser.add_argument('--max-rsi', type=float, default=32,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
 parser.add_argument('--successive-bullish', type=int, default=1,
