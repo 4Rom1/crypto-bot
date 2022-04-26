@@ -7,9 +7,10 @@ It fetches among all available pairs ending with USDT and select the ones that r
 It retrieves real time data and averages the signal (bid and ask price) over a period given by the user.  
 The signal to buy is given when  
 - The RSI is lower than a user defined value.
-- When there is a bullish trend (comparing recent average to older one).
+- When there is a bullish trend (comparing recent average to older one) (optional).
 - There is a series of successive increasing close values.
-- When the averaged volume is bigger than a user defined value.    
+- When the averaged volume is bigger than a user defined value.   
+- When max (close - open) > max (open - close). 
 
 The signal to sell is given when   
 - The bid price reaches a stop loss calculated with the ATR (average true range) computed over a window of 5 minutes steps.
