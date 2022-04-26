@@ -39,7 +39,7 @@ parser.add_argument('--min-volume', type=float, default=1000,
 parser.add_argument('--max-spread', type=float, default=0.2,
                     help='Maximal allowed spread in percent')
 
-parser.add_argument('--num-atr', type=float, default=10.0,
+parser.add_argument('--num-atr', type=float, default=5.0,
                     help='Multiplicative factor for the atr to compute the stop loss')
 
 parser.add_argument('--max-min-window', type=float, default=1,
@@ -51,7 +51,7 @@ parser.add_argument('--significant-steps', type=int, default=14,
 parser.add_argument('--max-rsi', type=float, default=32,
                     help='Maximum rsi to consider possible trend reversing in an uptrend')
 
-parser.add_argument('--successive-bullish', type=int, default=1,
+parser.add_argument('--successive-bullish', type=int, default=2,
                     help='Number of expected succesive bullish before being selected')
 
 parser.add_argument('--num-try', type=int, default=2,
