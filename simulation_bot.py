@@ -19,7 +19,7 @@ parser.add_argument('--sell-period', type=int,
                     help=' period for averaging signal during selling period', default=20)
 
 parser.add_argument('--buy-period', type=int,
-                    help=' period for averaging signal during buying period', default=40)
+                    help=' period for averaging signal during buying period', default=20)
 
 parser.add_argument('--sleep-time', type=int, default=5,
                     help='Sleep time between http requests in seconds')
@@ -306,12 +306,13 @@ if __name__ == "__main__":
 
                 stop_loss = (1.0-num_atr*saved_atr)*bid_price
                 take_profit = (1.0+maxratio/profit_ratio)*buy_price
+                buy_time = datetime.datetime.now()
 
                 BuyDict["take_profit"] = take_profit
                 BuyDict["stop_loss"] = stop_loss
                 BuyDict["bid_price"] = bid_price
                 BuyDict["buy_price"] = buy_price
-                BuyDict["time"] = datetime.datetime.now()
+                BuyDict["time"] = buy_time
 
                 pickle.dump(BuyDict, open("save_buy.p", "wb"))
             else:
