@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import argparse
 from utilities import show_chart, MaxDiffWindow, convert_to_float
 import pickle
+import datetime
 
 
 parser = argparse.ArgumentParser(description='Simple bot trading simulation.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -59,6 +60,9 @@ parser.add_argument('--num-try', type=int, default=2,
 parser.add_argument('--show-candle', type=bool, default=False,
                     help='Show candlestick of selected asset')
 
+parser.add_argument('--exit-trade', type=bool, default=False,
+                    help='Exit trade manualy after asset has been bought')
+
 parser.add_argument('--avg-up', type=bool, default=False,
                     help='Requires average moving up from the selected history to the recent one')
 
@@ -86,7 +90,7 @@ window = significant_steps
 rsi_lenght = significant_steps
 num_try = args.num_try
 avg_up = args.avg_up
-
+exit_trade = args.exit_trade
 
 def fetch_klines(asset, interval, previous_time_step):
 
@@ -263,6 +267,7 @@ if __name__ == "__main__":
 
                     if cnt % buy_period == 0:
                         print(f"{coin_price}")
+                        print(f"Time {datetime.datetime.now()}")
                         avg_price = avg_price/buy_period if cnt > 0 else avg_price
                         print(f"Average price {avg_price}")
                         if(last_avg < avg_price):
@@ -319,7 +324,7 @@ if __name__ == "__main__":
 
             cnt_down = 0
 
-            while(True):
+            while(True and not exit_trade):
 
                 for _ in range(num_try):
                     try:
@@ -332,6 +337,7 @@ if __name__ == "__main__":
 
                 if cnt % sell_period == 0:
                     print(f"{coin_price}")
+                    print(f"Time {datetime.datetime.now()}")
                     avg_price = avg_price/sell_period if cnt > 0 else avg_price
                     if(prev_avg > last_avg and last_avg < bid_price):
                         print(f"last price averaged {last_avg} moved down and price is lower than initial bid price for the {cnt_down+1} time")
@@ -357,6 +363,16 @@ if __name__ == "__main__":
 
                 cnt += 1
                 avg_price += coin_price['bidPrice']
+            
+            if exit_trade:
+                for _ in range(num_try):
+                    try:
+                        coin_price = convert_to_float(client.get_orderbook_ticker(symbol=savedcoin))
+                    except Exception as e:
+                        print(e)
+                        sleep(sleep_time)
+                        continue
+                    break    
 
             sell_price = coin_price['bidPrice']
 
