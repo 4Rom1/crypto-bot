@@ -149,7 +149,7 @@ def calculate_metric(data):
         ranges = pd.concat([high_low, high_close, low_close], axis=1)
         true_range = np.max(ranges, axis=1)
 
-        atr = np.average(true_range[-significant_steps:len(true_range)])
+        atr = np.average(true_range)
 
         RSI = get_rsi(data)
 
