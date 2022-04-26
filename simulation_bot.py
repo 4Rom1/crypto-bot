@@ -71,7 +71,7 @@ args = parser.parse_args()
 
 print(f'{args}')
 
-Benefits = 0
+
 profit_ratio = args.profit_ratio
 max_min_window = float(args.max_min_window)/100.0
 sleep_time = args.sleep_time
@@ -91,6 +91,14 @@ rsi_lenght = significant_steps
 num_try = args.num_try
 avg_up = args.avg_up
 exit_trade = args.exit_trade
+
+
+Benefits = {}
+Benefits['percent'] = 0
+
+if os.path.isfile('benefits.p'):
+        Benefits = pickle.load(open("benefits.p", "rb"))
+        
 
 def fetch_klines(asset, interval, previous_time_step):
 
@@ -372,6 +380,7 @@ if __name__ == "__main__":
                         print(e)
                         sleep(sleep_time)
                         continue
+                    exit_trade = False
                     break    
 
             sell_price = coin_price['bidPrice']
@@ -385,5 +394,8 @@ if __name__ == "__main__":
             print(f"sell_price {sell_price}, difference sell-buy {sell_price-buy_price}, percent {100*local_benef}%")
 
             # Trading fees are substracted from the benefits
-            Benefits += local_benef - 0.0015
-            print(f"Benefits so far {Benefits*100}%")
+            Benefits['percent'] += local_benef - 0.0015
+            pickle.dump(Benefits, open("benefits.p", "wb"))
+            print(f"Benefits so far {Benefits['percent']*100}%")
+            
+
