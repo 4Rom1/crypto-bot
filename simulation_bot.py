@@ -310,6 +310,7 @@ if __name__ == "__main__":
                 BuyDict["stop_loss"] = stop_loss
                 BuyDict["bid_price"] = bid_price
                 BuyDict["buy_price"] = buy_price
+                BuyDict["time"] = datetime.datetime.now()
 
                 pickle.dump(BuyDict, open("save_buy.p", "wb"))
             else:
@@ -318,9 +319,10 @@ if __name__ == "__main__":
                 stop_loss = BuyDict["stop_loss"]
                 bid_price = BuyDict["bid_price"]
                 buy_price = BuyDict["buy_price"]
+                buy_time = BuyDict["time"]
 
             print(f"take_profit {take_profit}={(1.0+maxratio/profit_ratio)*100.0} % of price, stop loss {stop_loss}={(1-num_atr*saved_atr)*100.0} % of price")
-            print(f"buy price {buy_price}")
+            print(f"buy price {buy_price} time {buy_time}")
             print(f"Corresponding bid price {bid_price}")
 
             sleep(sleep_time)
