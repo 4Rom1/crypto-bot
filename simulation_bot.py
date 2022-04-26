@@ -98,7 +98,8 @@ Benefits['percent'] = 0
 
 if os.path.isfile('benefits.p'):
         Benefits = pickle.load(open("benefits.p", "rb"))
-        
+ 
+print(f"Benefits so far {Benefits['percent']*100}%")        
 
 def fetch_klines(asset, interval, previous_time_step):
 
